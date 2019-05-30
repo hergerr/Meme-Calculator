@@ -1,4 +1,4 @@
-import pprint
+from models import Usb
 
 
 def calculate(usb_size, memes):
@@ -9,37 +9,40 @@ def calculate(usb_size, memes):
     and the second being the set of names of the memes that should be copied onto the USB stick to maximize its value
     """
 
-    usb_size = 12
+    # 1 GiB = 1024 MiB
+    usb_size *= 1024
 
-    best_values = [[0 for x in range(usb_size + 1)] for y in range(len(memes) + 1)]
+    # create matrix of all possible sizes of usb stick and quantity of memes inside it
+    # it's important to remember that usb stick can have 0 capacity and there could be 0 memes
+    best_values = [[Usb() for x in range(usb_size + 1)] for y in range(len(memes) + 1)]
 
     for i in range(1, len(memes) + 1):
         for j in range(1, usb_size + 1):
+
+            # if current usb stick size cannot fit meme, assign memes from smaller one
             if j - memes[i - 1][1] < 0:
                 best_values[i][j] = best_values[i - 1][j]
                 continue
-            best_values[i][j] = max(best_values[i - 1][j], best_values[i - 1][j - memes[i - 1][1]] + memes[i - 1][2])
 
-    pprint.pprint(best_values)
+            # if usb stick with i - 1 possible memes is more valuable than this with i memes
+            # current usb stick = this with i-1 memes
+            if best_values[i - 1][j].value > best_values[i - 1][j - memes[i - 1][1]].value + memes[i - 1][2]:
+                best_values[i][j] = best_values[i - 1][j]
+
+            # else add copy usb stick with i-1 memes and add i-th meme
+            else:
+                best_values[i][j].value = best_values[i - 1][j - memes[i - 1][1]].value + memes[i - 1][2]
+                best_values[i][j].meme_set = best_values[i - 1][j - memes[i - 1][1]].meme_set.copy()
+                best_values[i][j].meme_set.add(memes[i - 1][0])
+
+    # return tuple of value and set of meme names
+    return best_values[len(memes)][usb_size].value, best_values[len(memes)][usb_size].meme_set
 
 
 usb_size = 1
 memes = [
-    ('rollsafe.jpg', 3, 5),
-    ('sad_pepe_compilation.gif', 3, 7),
-    ('yodelng_kid.avi', 3, 5),
-    ('rollfe.jpg', 3, 9),
-    ('sad_pepe_compilation.gif', 3, 3),
-    ('yodeling_kid.avi', 3, 5),
-    ('rollsafe.jpg', 3, 5),
-    ('sad_pepe_compilation.gif', 3, 5),
-    ('yodeling_kid.avi', 3, 7),
-    ('rollsafe.jpg', 2, 4),
-    ('sad_pepe_compilation.gif', 2, 6),
-    ('yodeling_kid.avi', 2, 8),
-    ('rollsafe.jpg', 2, 4),
-    ('sad_pepe_compilation.gif', 2, 6),
-    ('yodeling_kid.avi', 2, 6),
-    ('z', 2, 2)
+    ('rollsafe.jpg', 205, 6),
+    ('sad_pepe_compilation.gif', 410, 10),
+    ('yodeling_kid.avi', 605, 12)
 ]
-calculate(usb_size, memes)
+print(calculate(usb_size, memes))
