@@ -3,10 +3,8 @@ from models import Usb
 
 def calculate(usb_size, memes):
     """
-    :param usb_size: size of usb stick
-    :param memes: list of tuples with memes (name, size, price)
-    :return:tuple with the first element being the total value of all memes on  the USB stick,
-    and the second being the set of names of the memes that should be copied onto the USB stick to maximize its value
+    Given the size of usb stick and list of tuples with memes (name, size, price),
+    returns the best possible value of memes on usb stick and names of those memes
     """
 
     # 1 GiB = 1024 MiB
@@ -14,6 +12,7 @@ def calculate(usb_size, memes):
 
     # create matrix of all possible sizes of usb stick and quantity of memes inside it
     # it's important to remember that usb stick can have 0 capacity and there could be 0 memes
+    # and that n+1 sized array is needed (to store values from 0 to n)
     best_values = [[Usb() for x in range(usb_size + 1)] for y in range(len(memes) + 1)]
 
     for i in range(1, len(memes) + 1):
@@ -35,14 +34,5 @@ def calculate(usb_size, memes):
                 best_values[i][j].meme_set = best_values[i - 1][j - memes[i - 1][1]].meme_set.copy()
                 best_values[i][j].meme_set.add(memes[i - 1][0])
 
-    # return tuple of value and set of meme names
+    # return tuple of value and set of meme names for given usb stick size
     return best_values[len(memes)][usb_size].value, best_values[len(memes)][usb_size].meme_set
-
-
-usb_size = 1
-memes = [
-    ('rollsafe.jpg', 205, 6),
-    ('sad_pepe_compilation.gif', 410, 10),
-    ('yodeling_kid.avi', 605, 12)
-]
-print(calculate(usb_size, memes))
