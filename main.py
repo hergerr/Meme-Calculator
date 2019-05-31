@@ -25,6 +25,9 @@ def calculate(usb_size, memes):
 
             # if usb stick with i - 1 possible memes is more valuable than this with i memes
             # current usb stick = this with i-1 memes
+            # memes[i - 1][1] is i-1st meme weight
+            # memes[i - 1][2] is i-1st meme value
+            # condition is build in that way that images size will never be bigger than usb size
             if best_values[i - 1][j].value > best_values[i - 1][j - memes[i - 1][1]].value + memes[i - 1][2]:
                 best_values[i][j] = best_values[i - 1][j]
 
