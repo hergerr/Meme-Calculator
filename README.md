@@ -14,3 +14,5 @@ Where:
 ### How to run
 
 Type in terminal opened in project directory: python3 main.py
+
+It works on python 3.6.7 and newer
